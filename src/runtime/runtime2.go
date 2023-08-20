@@ -367,6 +367,8 @@ type sudog struct {
 
 	// isSelect indicates g is participating in a select, so
 	// g.selectDone must be CAS'd to win the wake-up race.
+
+	//  isSelect 表示 g 在一个select 中
 	isSelect bool
 
 	// success indicates whether communication over channel c

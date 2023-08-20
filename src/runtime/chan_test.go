@@ -5,6 +5,7 @@
 package runtime_test
 
 import (
+	"fmt"
 	"internal/testenv"
 	"math"
 	"runtime"
@@ -13,6 +14,35 @@ import (
 	"testing"
 	"time"
 )
+
+/*---------------------myTest-------------------*/
+
+func TestChanMakeI(t *testing.T) {
+	ch := make(chan int, 2) // 创建一个有缓冲大小为2的通道
+
+	go func() {
+		fmt.Println("====1")
+		ch <- 10
+		ch <- 20 // 发送数据，有缓冲区未满，发送方不阻塞
+		fmt.Println("====2")
+		ch <- 30 // 发送数据，缓冲区已满，发送方阻塞
+		fmt.Println("====3")
+		fmt.Println("发送数据完成")
+	}()
+
+	time.Sleep(1 * time.Second)
+	val := <-ch // 接收数据，有缓冲区非空，接收方不阻塞
+	fmt.Println("接收到数据:", val)
+
+	time.Sleep(1 * time.Second)
+	val = <-ch // 接收数据，有缓冲区非空，接收方不阻塞
+	fmt.Println("接收到数据:", val)
+
+	val = <-ch // 接收数据，缓冲区为空，接收方阻塞
+	fmt.Println("接收到数据:", val)
+}
+
+/*---------------------myTest-------------------*/
 
 func TestChan(t *testing.T) {
 	defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(4))

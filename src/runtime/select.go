@@ -164,6 +164,7 @@ func selectgo(cas0 *scase, order0 *uint16, pc0 *uintptr, nsends, nrecvs int, blo
 
 	// generate permuted order
 	norder := 0
+	// 随机顺序生成
 	for i := range scases {
 		cas := &scases[i]
 
