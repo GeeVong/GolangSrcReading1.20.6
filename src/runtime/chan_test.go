@@ -16,25 +16,56 @@ import (
 )
 
 /*---------------------myTest-------------------*/
+// g往一个no buffer chan写入数据
+func TestChanBug01(t *testing.T) {
+	ch := make(chan int)
+	go func() {
+		ch <- 10 // 阻塞
+	}()
 
-func TestChanMakeI(t *testing.T) {
-	ch := make(chan int, 2) // 创建一个有缓冲大小为2的通道
+	select {
+	case <-ch:
+		res := <-ch
+		fmt.Println(res)
+	default:
+		fmt.Println("default")
+
+	}
+}
+
+/*
+ 发送数据，缓冲区已满，发送方阻塞
+	result:
+			=== RUN   TestBufferChan
+			====1
+			====2
+			一直阻塞在这里1
+			func chanrecv: 直接从sendq 队列中直接拿数据 一直阻塞在这里2
+			接收到数据: 10
+			====3
+			发送数据完成
+			接收到数据: 20
+			接收到数据: 30
+			--- PASS: TestBufferChan (3.00s)
+*/
+
+func TestBufferChan(t *testing.T) {
+	ch := make(chan int, 2)
 
 	go func() {
 		fmt.Println("====1")
 		ch <- 10
 		ch <- 20 // 发送数据，有缓冲区未满，发送方不阻塞
 		fmt.Println("====2")
-		ch <- 30 // 发送数据，缓冲区已满，发送方阻塞
+		ch <- 30 //阻塞 缓冲满
 		fmt.Println("====3")
 		fmt.Println("发送数据完成")
 	}()
 
-	time.Sleep(1 * time.Second)
+	time.Sleep(3 * time.Second)
 	val := <-ch // 接收数据，有缓冲区非空，接收方不阻塞
 	fmt.Println("接收到数据:", val)
 
-	time.Sleep(1 * time.Second)
 	val = <-ch // 接收数据，有缓冲区非空，接收方不阻塞
 	fmt.Println("接收到数据:", val)
 

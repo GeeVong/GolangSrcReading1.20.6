@@ -562,6 +562,9 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 			// and add sender's value to the tail of the queue (both map to
 			// the same buffer slot because the queue is full).
 			recv(c, sg, ep, func() { unlock(&c.lock) }, 3)
+
+			print("func chanrecv: 直接从sendq 队列中直接拿数据 ")
+
 			return true, true
 		}
 	}
